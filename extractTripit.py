@@ -238,7 +238,7 @@ def get_timezone(city, country):
 
 
 def convert_to_local_time(utc_str, city, country):
-    """Convert UTC timestamp to local time for city/country"""
+    """Convert UTC timestamp to local time for city/country in ISO 8601 format"""
     if not utc_str:
         return utc_str
     try:
@@ -247,14 +247,20 @@ def convert_to_local_time(utc_str, city, country):
             clean = utc_str.replace('Z', '+0000')
             dt = datetime.strptime(clean, '%Y%m%dT%H%M%S%z')
         elif len(utc_str) == 8 and 'T' not in utc_str:
-            # Date only
-            return utc_str
+            # Date only - convert to ISO format
+            return f"{utc_str[:4]}-{utc_str[4:6]}-{utc_str[6:8]}"
         else:
             # Try to parse
             clean = utc_str.replace('+0000', '').replace('Z', '')
             if 'T' in clean and len(clean) >= 15:
                 dt = datetime.strptime(clean[:15], '%Y%m%dT%H%M%S')
-                dt = dt.replace(tzinfo=ZoneInfo('UTC') if ZONEINFO_AVAILABLE else None)
+                if ZONEINFO_AVAILABLE:
+                    dt = dt.replace(tzinfo=ZoneInfo('UTC'))
+                elif PYTZ_AVAILABLE:
+                    import pytz
+                    dt = pytz.UTC.localize(dt)
+                else:
+                    dt = dt.replace(tzinfo=__import__('datetime').timezone.utc)
             else:
                 return utc_str
         
@@ -262,14 +268,15 @@ def convert_to_local_time(utc_str, city, country):
         if tz:
             if ZONEINFO_AVAILABLE and hasattr(dt, 'astimezone'):
                 local_dt = dt.astimezone(tz)
-                return local_dt.strftime('%Y%m%dT%H%M%S')
+                # ISO 8601 format: 2027-06-04T15:00:00+08:00 or 2027-06-04T15:00:00
+                return local_dt.strftime('%Y-%m-%dT%H:%M:%S%z')
             elif PYTZ_AVAILABLE:
                 utc_dt = dt
                 if utc_dt.tzinfo is None:
                     import pytz
                     utc_dt = pytz.UTC.localize(utc_dt)
                 local_dt = utc_dt.astimezone(tz)
-                return local_dt.strftime('%Y%m%dT%H%M%S')
+                return local_dt.strftime('%Y-%m-%dT%H:%M:%S%z')
         return utc_str
     except Exception as e:
         return utc_str
