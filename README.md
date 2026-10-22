@@ -141,7 +141,7 @@ geocoder reports differently.
 | DESCRIPTION | Full event description |
 
 ### extractTripit_summary.csv
-Lodging summary: one row per check-in, with the matching check-out:
+Lodging summary: one row per check-in that has a matching check-out:
 | Field | Description |
 |-------|-------------|
 | Hotel Name | Event summary (hotel/check-in/check-out name) |
