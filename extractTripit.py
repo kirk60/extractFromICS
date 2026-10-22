@@ -154,7 +154,11 @@ def save_json(path, data):
 
 
 def geocode_location(location, cache_file=None):
-    """Geocode location using Nominatim (OpenStreetMap) API with fallback"""
+    """Geocode location using Nominatim (OpenStreetMap) API with fallback.
+
+    The names are asked for in English, so the city and the country are
+    reported in English whatever the local names of the place are.
+    """
     if not location or not location.strip():
         return None, None
     
@@ -164,7 +168,7 @@ def geocode_location(location, cache_file=None):
     # Load cache
     cache = load_json(cache_file, {})
     
-    cache_key = location.strip().lower()
+    cache_key = f"{location.strip().lower()}|en"
     if cache_key in cache:
         cached = cache[cache_key]
         return cached.get('city'), cached.get('country')
@@ -176,7 +180,7 @@ def geocode_location(location, cache_file=None):
             response = requests.get(
                 "https://nominatim.openstreetmap.org/search",
                 params={"q": location, "format": "json", "addressdetails": 1, "limit": 1},
-                headers={"User-Agent": "extractTripit/1.0"},
+                headers={"User-Agent": "extractTripit/1.0", "Accept-Language": "en"},
                 timeout=10
             )
             if response.status_code == 200:
@@ -185,7 +189,8 @@ def geocode_location(location, cache_file=None):
                     addr = data[0].get('address', {})
                     city = addr.get('city') or addr.get('town') or addr.get('village') or addr.get('municipality') or addr.get('suburb') or addr.get('county')
                     country = addr.get('country')
-                    # Save to cache
+                    # Save to cache (entries of other languages are dropped)
+                    cache = {k: v for k, v in cache.items() if k.endswith('|en')}
                     cache[cache_key] = {'city': city, 'country': country}
                     save_json(cache_file, cache)
                     time.sleep(1)  # Respect rate limit
@@ -223,6 +228,9 @@ COUNTRY_ALIASES = {
     'greatbritain': 'united kingdom',
     'uae': 'united arab emirates',
 }
+
+# The English name of the countries that are commonly written differently.
+COUNTRY_NAMES = {alias: name.title() for alias, name in COUNTRY_ALIASES.items()}
 
 # The geocoder used for city names: the same service the other programs in
 # the trip planning suite geocode with, so the names it returns are names
@@ -262,34 +270,39 @@ def city_name_candidates(city):
     candidates = []
     seen = set()
 
-    def add(name):
+    def add(name, place_code_ok=True):
         name = collapse_spaces(name).strip(' ,.-')
-        if name and name.lower() not in seen:
-            seen.add(name.lower())
-            candidates.append(name)
+        if not name or name.lower() in seen:
+            return
+        # A state code or a postcode on its own is not a city name.
+        if not place_code_ok and (re.match(r'^[A-Z]{2,3}$', name) or re.match(r'^\d{3,5}$', name)):
+            return
+        seen.add(name.lower())
+        candidates.append(name)
 
     base = collapse_spaces(city)
     if '>' in base:  # OpenStreetMap style: "Darwin > CBD"
         base = collapse_spaces(base.split('>')[0])
     add(base)
 
-    # Drop a trailing state and/or postcode ("Exmouth WA 6707")
+    # Drop a trailing state and/or postcode ("Exmouth WA 6707", "Perth WA")
     without_postcode = re.sub(r'\s+[A-Za-z]{2,3}\s*\d{3,5}$', '', base)
     without_postcode = re.sub(r'\s+\d{3,5}$', '', without_postcode)
-    add(without_postcode)
+    add(without_postcode, place_code_ok=False)
+    add(re.sub(r'\s+[A-Z]{2,3}$', '', without_postcode), place_code_ok=False)
 
     # Drop trailing district qualifiers ("Darwin CBD")
     words = without_postcode.split()
     while len(words) > 1 and words[-1].lower().strip('.,') in CITY_QUALIFIER_WORDS:
         words.pop()
-    add(' '.join(words))
+    add(' '.join(words), place_code_ok=False)
 
     # A suburb with its city ("Djugun Broome") keeps the city in the last
     # word; a city with its suburb ("Broome Djugun") in the first one.
     parts = without_postcode.split()
     if len(parts) > 1:
-        add(parts[-1])
-        add(parts[0])
+        add(parts[-1], place_code_ok=False)
+        add(parts[0], place_code_ok=False)
 
     return candidates
 
@@ -324,26 +337,30 @@ class CityTable:
                 if not name:
                     continue
                 key = (collapse_spaces(name).lower(), country.lower())
-                self.by_key[key] = canonical
+                self.by_key[key] = (canonical, country)
                 self.by_name.setdefault(key[0], set()).add((key[1], canonical))
 
     def lookup(self, name, country):
-        """The accepted name for a city name, or None when it is unknown"""
+        """The accepted name for a city name and its country, or None.
+
+        The country is the one written in the table (an English name), so a
+        city that is found under a different name still gets a country name
+        in English.
+        """
         key = collapse_spaces(name).lower()
         if not key:
             return None
         want_country = collapse_spaces(country).lower()
         if want_country:
-            if (key, want_country) in self.by_key:
-                return self.by_key[(key, want_country)]
-            if (key, '') in self.by_key:
-                return self.by_key[(key, '')]
-            return None
+            hit = self.by_key.get((key, want_country)) or self.by_key.get((key, ''))
+            return hit
         # Without a country the name is only usable when it is unambiguous.
-        canonicals = {canonical for _, canonical in self.by_name.get(key, set())}
-        if len(canonicals) == 1:
-            return canonicals.pop()
-        return None
+        entries = self.by_name.get(key) or set()
+        canonicals = {canonical for _, canonical in entries}
+        if len(canonicals) != 1:
+            return None
+        countries = {row_country for row_country, _ in entries if row_country}
+        return (canonicals.pop(), countries.pop() if len(countries) == 1 else '')
 
 
 def score_city_result(result, candidate):
@@ -355,10 +372,12 @@ def score_city_result(result, candidate):
     elif candidate.lower() in name.lower():
         score += 40
     feature = (result.get('feature_code') or '').upper()
-    if feature.startswith('PPL'):  # populated place
-        score += 20
-    elif feature.startswith('ADM'):  # administrative area
-        score += 5
+    if feature.startswith('PPL') and not feature.startswith('PPLX'):
+        score += 20  # populated place
+    elif feature.startswith('PPLX'):
+        score += 5  # section of a populated place (a suburb)
+    elif feature.startswith('ADM'):
+        score += 5  # administrative area
     population = result.get('population')
     if isinstance(population, (int, float)):
         score += min(population / 1000000, 10)
@@ -368,14 +387,17 @@ def score_city_result(result, candidate):
 def lookup_city_geocoder(candidate, country, cache_file=None, use_network=True):
     """Look a city name up in the geocoder the other programs use.
 
-    Returns the (city, country) of the best match, or None when the name is
-    unknown. Results are cached, so a name is only looked up once.
+    Returns the (city, country, timezone, feature code) of the best match,
+    or None when the name is unknown. The names are asked for in English.
+    Results are cached, so a name is only looked up once.
     """
     cache = load_json(cache_file, {}) if cache_file else {}
-    cache_key = f"{candidate.lower()}|{country_key(country)}"
+    cache_key = f"{candidate.lower()}|{country_key(country)}|en"
     if cache_key in cache:
         cached = cache[cache_key]
-        return (cached['city'], cached['country']) if cached else None
+        if not cached:
+            return None
+        return (cached['city'], cached['country'], cached.get('timezone', ''), cached.get('feature_code', ''))
 
     found = None
     if use_network and REQUESTS_AVAILABLE:
@@ -391,53 +413,80 @@ def lookup_city_geocoder(candidate, country, cache_file=None, use_network=True):
                 if results:
                     in_country = [r for r in results if country_matches(r.get('country'), country)]
                     best = max(in_country or results, key=lambda r: score_city_result(r, candidate))
-                    found = ((best.get('name') or '').strip(), (best.get('country') or '').strip())
+                    found = (
+                        (best.get('name') or '').strip(),
+                        (best.get('country') or '').strip(),
+                        (best.get('timezone') or '').strip(),
+                        (best.get('feature_code') or '').strip(),
+                    )
         except Exception:
             found = None
 
     if cache_file is not None:
-        cache[cache_key] = {'city': found[0], 'country': found[1]} if found else None
+        cache[cache_key] = {
+            'city': found[0],
+            'country': found[1],
+            'timezone': found[2],
+            'feature_code': found[3],
+        } if found else None
         save_json(cache_file, cache)
 
     return found
 
 
 def canonical_city_name(city, country, table=None, cache_file=None, use_network=True):
-    """The accepted name of a city, and the country it belongs to.
+    """The accepted name of a city, the country it is in and its timezone.
 
     The city table is consulted first (it holds the accepted names and the
     aliases of them), the geocoder afterwards, so a city that is not in the
-    table still gets an accepted name. The name is returned unchanged when
-    nothing matches it.
+    table still gets an accepted name. Both sources are asked for English
+    names. The name is returned unchanged when nothing matches it.
     """
     if not city:
-        return '', country
+        return '', country, ''
 
     candidates = city_name_candidates(city)
 
     if table is not None:
         for candidate in candidates:
-            accepted = table.lookup(candidate, country)
-            if accepted:
-                return accepted, country
+            hit = table.lookup(candidate, country)
+            if hit:
+                accepted, accepted_country = hit
+                return accepted, accepted_country or country, ''
 
-    mismatch = None
+    suburb = None
     for candidate in candidates:
         found = lookup_city_geocoder(candidate, country, cache_file, use_network)
         if not found:
             continue
-        name, found_country = found
-        if not country or country_matches(found_country, country):
-            return name, found_country or country
-        if mismatch is None:
-            mismatch = (name, found_country)
+        name, found_country, timezone, feature_code = found
+        if country and not country_matches(found_country, country):
+            # The name is only known in another country: it is not this city.
+            continue
+        if feature_code.upper() == 'PPLX':
+            # A section of a populated place is a suburb or a district rather
+            # than a city: keep it, but keep looking for the city itself.
+            if suburb is None:
+                suburb = (name, found_country or country, timezone)
+            continue
+        return name, found_country or country, timezone
 
-    if mismatch:
-        # The name is only known in another country: keep the name, but leave
-        # the country as it was found.
-        return mismatch[0], country
+    if suburb:
+        return suburb
 
-    return candidates[0], country
+    if not candidates:
+        return '', COUNTRY_NAMES.get(country_key(country), country), ''
+
+    return candidates[0], COUNTRY_NAMES.get(country_key(country), country), ''
+
+
+def lookup_city_timezone(city, country, cache_file=None, use_network=True):
+    """The timezone of a city, as the geocoder reports it.
+
+    Used for the cities the built-in timezone table does not know.
+    """
+    found = lookup_city_geocoder(city, country, cache_file, use_network)
+    return found[2] if found else ''
 
 
 def get_timezone(city, country):
@@ -489,8 +538,12 @@ def get_timezone(city, country):
     return None
 
 
-def convert_to_local_time(utc_str, city, country):
-    """Convert UTC timestamp to local time for city/country in ISO 8601 format"""
+def convert_to_local_time(utc_str, city, country, timezone=None):
+    """Convert UTC timestamp to local time for city/country in ISO 8601 format
+
+    The timezone is used when it is known (the name of a timezone, as the
+    geocoder reports it), the built-in table of Australian cities otherwise.
+    """
     if not utc_str:
         return utc_str
     try:
@@ -516,7 +569,21 @@ def convert_to_local_time(utc_str, city, country):
             else:
                 return utc_str
         
-        tz = get_timezone(city, country)
+        tz = None
+        if timezone:
+            if ZONEINFO_AVAILABLE:
+                try:
+                    tz = ZoneInfo(timezone)
+                except Exception:
+                    tz = None
+            elif PYTZ_AVAILABLE:
+                try:
+                    import pytz
+                    tz = pytz.timezone(timezone)
+                except Exception:
+                    tz = None
+        if tz is None:
+            tz = get_timezone(city, country)
         if tz:
             if ZONEINFO_AVAILABLE and hasattr(dt, 'astimezone'):
                 local_dt = dt.astimezone(tz)
@@ -770,8 +837,8 @@ def main():
             """
             city, country = raw_city_country(location)
             if not use_canonical_cities or not city:
-                return city, country
-            accepted, accepted_country = canonical_city_name(
+                return city, country, ''
+            accepted, accepted_country, timezone = canonical_city_name(
                 city, country,
                 table=city_table,
                 cache_file=city_cache_file,
@@ -779,7 +846,7 @@ def main():
             )
             if accepted and accepted != city:
                 city_changes.append((city, accepted))
-            return accepted, accepted_country or country
+            return accepted, accepted_country or country, timezone
 
         lodging_entries = []
         for row in filtered_sorted:
@@ -827,9 +894,17 @@ def main():
                             break
                 if matched_checkout:
                     location = checkin['location'] or matched_checkout['location']
-                    city, country = extract_city_country(location)
-                    start_local = convert_to_local_time(checkin['start'], city, country)
-                    end_local = convert_to_local_time(matched_checkout['end'], city, country)
+                    city, country, timezone = extract_city_country(location)
+                    if not timezone and not get_timezone(city, country):
+                        # A city outside Australia: ask the geocoder for its
+                        # timezone, so the times are local to the city.
+                        timezone = lookup_city_timezone(
+                            city, country,
+                            cache_file=city_cache_file,
+                            use_network=REQUESTS_AVAILABLE and not args.no_geocode,
+                        )
+                    start_local = convert_to_local_time(checkin['start'], city, country, timezone)
+                    end_local = convert_to_local_time(matched_checkout['end'], city, country, timezone)
                     summary_rows.append({
                         'Hotel Name': checkin['hotel_name'],
                         'location': location,

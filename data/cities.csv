@@ -74,7 +74,6 @@ Mudgee,Australia,
 Muswellbrook,Australia,
 Nambour,Australia,
 Newcastle,Australia,
-Ningaloo,Australia,
 Northam,Australia,
 Nowra,Australia,
 Orange,Australia,
@@ -134,7 +133,6 @@ Chicago,United States,
 Cusco,Peru,
 Delhi,India,
 Dublin,Ireland,
-Dubuque,United States,
 Erfurt,Germany,
 Hanoi,Vietnam,
 Ho Chi Minh City,Vietnam,
@@ -151,7 +149,6 @@ Los Angeles,United States,
 Luxor,Egypt,
 Madrid,Spain,
 Marrakesh,Morocco,
-Melbourne,Australia,
 Mexico City,Mexico,
 Miami,United States,
 Munich,Germany,
@@ -173,7 +170,6 @@ Seville,Spain,
 Shanghai,China,
 Singapore,Singapore,
 Suva,Fiji,
-Sydney,Australia,
 Taipei,Taiwan,
 Tel Aviv,Israel,
 Tokyo,Japan,
@@ -194,6 +190,7 @@ Adelaide CBD,Australia,Adelaide
 Darwin City,Australia,Darwin
 Perth City,Australia,Perth
 Djugun Broome,Australia,Broome
+Djugun,Australia,Broome
 Minyirr,Australia,Broome
 Learmonth Airport,Australia,Learmonth
 Ningaloo,Australia,Exmouth
