@@ -6,8 +6,15 @@ extractTripit - Extract data from TripIt ICS files into CSV
 import csv
 import os
 import re
+import json
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
+try:
+    import requests
+    REQUESTS_AVAILABLE = True
+except ImportError:
+    REQUESTS_AVAILABLE = False
 
 
 def unfold_lines(content):
@@ -116,6 +123,60 @@ def extract_trip_data(events):
     return extracted
 
 
+def geocode_location(location, cache_file=None):
+    """Geocode location using Nominatim (OpenStreetMap) API with fallback"""
+    if not location or not location.strip():
+        return None, None
+    
+    if cache_file is None:
+        cache_file = Path(__file__).parent / 'results' / 'geocode_cache.json'
+    
+    # Load cache
+    cache = {}
+    if cache_file.exists():
+        try:
+            with open(cache_file, 'r', encoding='utf-8') as f:
+                cache = json.load(f)
+        except:
+            cache = {}
+    
+    cache_key = location.strip().lower()
+    if cache_key in cache:
+        cached = cache[cache_key]
+        return cached.get('city'), cached.get('country')
+    
+    city, country = None, None
+    if REQUESTS_AVAILABLE:
+        try:
+            # Use Nominatim API (free, rate-limited to 1 req/sec)
+            response = requests.get(
+                "https://nominatim.openstreetmap.org/search",
+                params={"q": location, "format": "json", "addressdetails": 1, "limit": 1},
+                headers={"User-Agent": "extractTripit/1.0"},
+                timeout=10
+            )
+            if response.status_code == 200:
+                data = response.json()
+                if data:
+                    addr = data[0].get('address', {})
+                    city = addr.get('city') or addr.get('town') or addr.get('village') or addr.get('municipality') or addr.get('suburb') or addr.get('county')
+                    country = addr.get('country')
+                    # Save to cache
+                    cache[cache_key] = {'city': city, 'country': country}
+                    cache_file.parent.mkdir(exist_ok=True)
+                    try:
+                        with open(cache_file, 'w', encoding='utf-8') as f:
+                            json.dump(cache, f, indent=2)
+                    except:
+                        pass
+                    time.sleep(1)  # Respect rate limit
+                    return city, country
+        except Exception as e:
+            pass
+    
+    return None, None
+
+
 def main():
     script_dir = Path(__file__).parent
     ics_path = script_dir / 'data' / 'sample_trip.ics'
@@ -123,14 +184,25 @@ def main():
     results_dir.mkdir(exist_ok=True)
     extract_path = results_dir / 'extractTripit.csv'
     summary_path = results_dir / 'extractTripit_summary.csv'
+    cache_file = results_dir / 'geocode_cache.json'
     
     import sys
     import argparse
-    parser = argparse.ArgumentParser(description='Extract data from TripIt ICS files into CSV')
+    parser = argparse.ArgumentParser(description='Extract data from TripIt ICS files into CSV/HTML')
     parser.add_argument('ics', nargs='?', help='Input ICS file')
     parser.add_argument('-e', '--extract', help='Extract output file name')
     parser.add_argument('-s', '--summary', help='Summary output file name')
+    parser.add_argument('--geocode', action='store_true', help='Use geocoding API to standardize locations')
+    parser.add_argument('--no-geocode', action='store_true', help='Disable geocoding, use regex only')
+    parser.add_argument('--html', action='store_true', help='Output HTML format instead of CSV (default is CSV)')
     args = parser.parse_args()
+    
+    use_geocode = args.geocode and not args.no_geocode
+    if REQUESTS_AVAILABLE and not args.no_geocode and args.geocode:
+        use_geocode = True
+    elif REQUESTS_AVAILABLE and not args.geocode and not args.no_geocode:
+        # Auto-enable geocoding if requests available
+        use_geocode = True
     
     if args.ics:
         ics_path = Path(args.ics)
@@ -194,12 +266,51 @@ def main():
         fieldnames = ['TYPE', 'SUMMARY', 'LOCATION', 'DTSTART', 'DTEND', 'DTSTART_IS_DATE', 
                       'DTEND_IS_DATE', 'UID', 'DTSTAMP', 'DESCRIPTION']
         
-        with open(output_extract, 'w', newline='', encoding='utf-8') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-            writer.writeheader()
+        if args.html or (str(output_extract).lower().endswith('.html')):
+            html_content = []
+            html_content.append('<!DOCTYPE html>')
+            html_content.append('<html lang="en">')
+            html_content.append('<head>')
+            html_content.append('    <meta charset="UTF-8">')
+            html_content.append('    <meta name="viewport" content="width=device-width, initial-scale=1.0">')
+            html_content.append('    <title>TripIt Extract</title>')
+            html_content.append('    <style>')
+            html_content.append('        body { font-family: Arial, sans-serif; margin: 20px; }')
+            html_content.append('        table { border-collapse: collapse; width: 100%; }')
+            html_content.append('        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }')
+            html_content.append('        th { background-color: #f2f2f2; }')
+            html_content.append('        tr:nth-child(even) { background-color: #f9f9f9; }')
+            html_content.append('    </style>')
+            html_content.append('</head>')
+            html_content.append('<body>')
+            html_content.append('    <h1>TripIt Extract</h1>')
+            html_content.append('    <table>')
+            html_content.append('        <thead>')
+            html_content.append('            <tr>')
+            for field in fieldnames:
+                html_content.append(f'                <th>{field}</th>')
+            html_content.append('            </tr>')
+            html_content.append('        </thead>')
+            html_content.append('        <tbody>')
             for row in filtered_sorted:
-                out_row = {k: row.get(k, '') for k in fieldnames}
-                writer.writerow(out_row)
+                html_content.append('            <tr>')
+                for field in fieldnames:
+                    value = str(row.get(field, '')).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+                    html_content.append(f'                <td>{value}</td>')
+                html_content.append('            </tr>')
+            html_content.append('        </tbody>')
+            html_content.append('    </table>')
+            html_content.append('</body>')
+            html_content.append('</html>')
+            with open(output_extract, 'w', encoding='utf-8') as f:
+                f.write('\n'.join(html_content))
+        else:
+            with open(output_extract, 'w', newline='', encoding='utf-8') as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                writer.writeheader()
+                for row in filtered_sorted:
+                    out_row = {k: row.get(k, '') for k in fieldnames}
+                    writer.writerow(out_row)
         
         print(f"Successfully extracted data to {output_extract}")
         print(f"Rows written: {len(filtered_sorted)}")
@@ -209,6 +320,31 @@ def main():
         def extract_city_country(location):
             if not location:
                 return '', ''
+            # Try geocoding first if enabled
+            if use_geocode and REQUESTS_AVAILABLE:
+                geo_city, geo_country = geocode_location(location, cache_file)
+                if geo_city or geo_country:
+                    # Use geocoded results if available
+                    city = geo_city or ''
+                    country = geo_country or ''
+                    # If geocoding gave us country but not city, try regex as fallback
+                    if not city and country:
+                        parts = [p.strip() for p in location.split(',')]
+                        for i, p in enumerate(parts):
+                            if i == 0 or i == len(parts) - 1:
+                                continue
+                            p_clean = p.strip()
+                            if not p_clean or re.match(r'^\d{4,5}$', p_clean) or re.match(r'^[A-Z]{2,3}\s*\d{4,5}$', p_clean) or re.match(r'^[A-Z]{2,3}$', p_clean) or re.match(r'^\d+\s+', p_clean):
+                                continue
+                            city = p_clean
+                            break
+                    # If geocoding gave city but we want to be more specific, sometimes use regex
+                    elif city and not country:
+                        parts = [p.strip() for p in location.split(',')]
+                        if parts:
+                            country = parts[-1].strip()
+                    return city, country
+            # Fallback to regex parsing
             # Try to split by comma
             parts = [p.strip() for p in location.split(',')]
             if not parts:
@@ -307,17 +443,56 @@ def main():
                         'location': location,
                         'City': city,
                         'Country': country,
-                        'Start Date': checkin['start'],
-                        'endDate': matched_checkout['end']
+                        'StartDate': checkin['start'],
+                        'EndDate': matched_checkout['end']
                     })
         
         print(f"Writing summary to: {output_summary}")
-        summary_fieldnames = ['Hotel Name', 'location', 'City', 'Country', 'Start Date', 'endDate']
-        with open(output_summary, 'w', newline='', encoding='utf-8') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=summary_fieldnames)
-            writer.writeheader()
+        summary_fieldnames = ['Hotel Name', 'location', 'City', 'Country', 'StartDate', 'EndDate']
+        if args.html or (str(output_summary).lower().endswith('.html')):
+            html_content = []
+            html_content.append('<!DOCTYPE html>')
+            html_content.append('<html lang="en">')
+            html_content.append('<head>')
+            html_content.append('    <meta charset="UTF-8">')
+            html_content.append('    <meta name="viewport" content="width=device-width, initial-scale=1.0">')
+            html_content.append('    <title>TripIt Summary</title>')
+            html_content.append('    <style>')
+            html_content.append('        body { font-family: Arial, sans-serif; margin: 20px; }')
+            html_content.append('        table { border-collapse: collapse; width: 100%; }')
+            html_content.append('        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }')
+            html_content.append('        th { background-color: #f2f2f2; }')
+            html_content.append('        tr:nth-child(even) { background-color: #f9f9f9; }')
+            html_content.append('    </style>')
+            html_content.append('</head>')
+            html_content.append('<body>')
+            html_content.append('    <h1>TripIt Summary</h1>')
+            html_content.append('    <table>')
+            html_content.append('        <thead>')
+            html_content.append('            <tr>')
+            for field in summary_fieldnames:
+                html_content.append(f'                <th>{field}</th>')
+            html_content.append('            </tr>')
+            html_content.append('        </thead>')
+            html_content.append('        <tbody>')
             for row in summary_rows:
-                writer.writerow(row)
+                html_content.append('            <tr>')
+                for field in summary_fieldnames:
+                    value = str(row.get(field, '')).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+                    html_content.append(f'                <td>{value}</td>')
+                html_content.append('            </tr>')
+            html_content.append('        </tbody>')
+            html_content.append('    </table>')
+            html_content.append('</body>')
+            html_content.append('</html>')
+            with open(output_summary, 'w', encoding='utf-8') as f:
+                f.write('\n'.join(html_content))
+        else:
+            with open(output_summary, 'w', newline='', encoding='utf-8') as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=summary_fieldnames)
+                writer.writeheader()
+                for row in summary_rows:
+                    writer.writerow(row)
         
         print(f"Successfully extracted summary to {output_summary}")
         print(f"Summary rows written: {len(summary_rows)}")
