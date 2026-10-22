@@ -15,6 +15,17 @@ try:
     REQUESTS_AVAILABLE = True
 except ImportError:
     REQUESTS_AVAILABLE = False
+try:
+    from zoneinfo import ZoneInfo
+    ZONEINFO_AVAILABLE = True
+except ImportError:
+    try:
+        import pytz
+        PYTZ_AVAILABLE = True
+        ZONEINFO_AVAILABLE = False
+    except ImportError:
+        PYTZ_AVAILABLE = False
+        ZONEINFO_AVAILABLE = False
 
 
 def unfold_lines(content):
@@ -175,6 +186,93 @@ def geocode_location(location, cache_file=None):
             pass
     
     return None, None
+
+
+def get_timezone(city, country):
+    """Get timezone for city/country"""
+    # Common Australian city timezones
+    tz_map = {
+        'perth': 'Australia/Perth',
+        'sydney': 'Australia/Sydney',
+        'melbourne': 'Australia/Melbourne',
+        'brisbane': 'Australia/Brisbane',
+        'adelaide': 'Australia/Adelaide',
+        'darwin': 'Australia/Darwin',
+        'hobart': 'Australia/Hobart',
+        'canberra': 'Australia/Sydney',
+        'gold coast': 'Australia/Brisbane',
+        'cairns': 'Australia/Brisbane',
+        'broome': 'Australia/Perth',
+        'exmouth': 'Australia/Perth',
+        'port douglas': 'Australia/Brisbane',
+        'learmonth': 'Australia/Perth',
+    }
+    if city:
+        city_lower = city.lower()
+        for key, tz in tz_map.items():
+            if key in city_lower:
+                if ZONEINFO_AVAILABLE:
+                    try:
+                        return ZoneInfo(tz)
+                    except:
+                        pass
+                elif PYTZ_AVAILABLE:
+                    try:
+                        import pytz
+                        return pytz.timezone(tz)
+                    except:
+                        pass
+    if country and country.lower() == 'australia':
+        if ZONEINFO_AVAILABLE:
+            try:
+                return ZoneInfo('Australia/Sydney')
+            except:
+                pass
+        elif PYTZ_AVAILABLE:
+            try:
+                import pytz
+                return pytz.timezone('Australia/Sydney')
+            except:
+                pass
+    return None
+
+
+def convert_to_local_time(utc_str, city, country):
+    """Convert UTC timestamp to local time for city/country"""
+    if not utc_str:
+        return utc_str
+    try:
+        # Parse UTC format like 20270604T070000Z
+        if utc_str.endswith('Z'):
+            clean = utc_str.replace('Z', '+0000')
+            dt = datetime.strptime(clean, '%Y%m%dT%H%M%S%z')
+        elif len(utc_str) == 8 and 'T' not in utc_str:
+            # Date only
+            return utc_str
+        else:
+            # Try to parse
+            clean = utc_str.replace('+0000', '').replace('Z', '')
+            if 'T' in clean and len(clean) >= 15:
+                dt = datetime.strptime(clean[:15], '%Y%m%dT%H%M%S')
+                dt = dt.replace(tzinfo=ZoneInfo('UTC') if ZONEINFO_AVAILABLE else None)
+            else:
+                return utc_str
+        
+        tz = get_timezone(city, country)
+        if tz:
+            if ZONEINFO_AVAILABLE and hasattr(dt, 'astimezone'):
+                local_dt = dt.astimezone(tz)
+                return local_dt.strftime('%Y%m%dT%H%M%S')
+            elif PYTZ_AVAILABLE:
+                utc_dt = dt
+                if utc_dt.tzinfo is None:
+                    import pytz
+                    utc_dt = pytz.UTC.localize(utc_dt)
+                local_dt = utc_dt.astimezone(tz)
+                return local_dt.strftime('%Y%m%dT%H%M%S')
+        return utc_str
+    except Exception as e:
+        return utc_str
 
 
 def main():
@@ -438,13 +536,15 @@ def main():
                 if matched_checkout:
                     location = checkin['location'] or matched_checkout['location']
                     city, country = extract_city_country(location)
+                    start_local = convert_to_local_time(checkin['start'], city, country)
+                    end_local = convert_to_local_time(matched_checkout['end'], city, country)
                     summary_rows.append({
                         'Hotel Name': checkin['hotel_name'],
                         'location': location,
                         'City': city,
                         'Country': country,
-                        'StartDate': checkin['start'],
-                        'EndDate': matched_checkout['end']
+                        'StartDate': start_local,
+                        'EndDate': end_local
                     })
         
         print(f"Writing summary to: {output_summary}")
