@@ -1,0 +1,338 @@
+BEGIN:VCALENDAR
+METHOD:PUBLISH
+X-WR-CALNAME:alison Tanswell (TripIt - Broome, WA, Australia, June 2027)
+X-WR-CALDESC:Broome, WA, Australia, June 2027 (Trip Shared by alison Tansw
+ ell)
+PRODID:-//John Papaioannou/NONSGML Bennu 0.1//EN
+VERSION:2.0
+BEGIN:VEVENT
+DTSTAMP:20261022T045557Z
+UID:53ab9a25-cd87-9000-0001-000016b5008c@tripit.com
+DTSTART;VALUE=DATE:20270604
+DTEND;VALUE=DATE:20270708
+SUMMARY:Broome\, WA\, Australia\, June 2027
+LOCATION:Broome\, WA\, Australia
+GEO:-17.95538;122.23922
+TRANSP:TRANSPARENT
+DESCRIPTION:alison Tanswell is in Broome\, WA\, Australia from Jun 4 to Ju
+ l 7\, 2027\nView and/or edit details in TripIt : https://www.tripit.com/tr
+ ip/show?id=380960908\nTripIt - organize your travel at https://www.tripit.
+ com\n
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261022T045557Z
+DTEND:20270604T072500Z
+SUMMARY:QF649 SYD to PER
+LOCATION:Sydney (SYD)
+UID:item-f5f7e827-fd3d-9000-0003-000147db9f15@tripit.com
+DTSTART:20270604T022500Z
+DESCRIPTION:View and/or edit details in TripIt : https://www.tripit.com/tr
+ ip/show/id/380960908\n \n\nFri\, Jun 4\n12:25 PM AEST\n[Flight] SYD to PER
+ \n \n\nQantas 649\, Terminal 3\, Gate \n \n\n3:25 PM AWST\nArrive Perth (P
+ ER)\nTerminal 4\, Gate \n \n\n \nTripIt - organize your travel at https://
+ www.tripit.com
+GEO:-31.95224;115.8614
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261022T045557Z
+SUMMARY:Check-in: Hyde Perth
+TRANSP:TRANSPARENT
+UID:item-d2f79159-81dc-9000-0003-000147dbcfc5@tripit.com
+DTSTART:20270604T070000Z
+DTEND:20270604T080000Z
+LOCATION:37 Pier Street Perth\, Perth\, 6000\, Australia
+DESCRIPTION:View and/or edit details in TripIt : https://www.tripit.com/tr
+ ip/show/id/380960908\n \n\n3:00 PM AWST\n[Lodging] Arrive Hyde Perth\nChec
+ k-In: 3:00pm\n37 Pier Street Perth\, Perth\, 6000\, Australia\n+1234567891
+ 0\n \n\n \nTripIt - organize your travel at https://www.tripit.com
+GEO:-31.954552;115.8624449
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261022T045557Z
+SUMMARY:Check-out: Hyde Perth
+TRANSP:TRANSPARENT
+UID:item-5883dd4d-d671-9000-0003-000147dbcfc9@tripit.com
+DTSTART:20270607T030000Z
+DTEND:20270607T040000Z
+LOCATION:37 Pier Street Perth\, Perth\, 6000\, Australia
+DESCRIPTION:View and/or edit details in TripIt : https://www.tripit.com/tr
+ ip/show/id/380960908\n \n\nMon\, Jun 7\n11:00 AM AWST\n[Lodging] Depart Hy
+ de Perth\nCheck-Out: 11:00am\n37 Pier Street Perth\, Perth\, 6000\, Austra
+ lia\n+12345678910\n \n\n \nTripIt - organize your travel at https://www.tr
+ ipit.com
+GEO:-31.954552;115.8624449
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261022T045557Z
+DTEND:20270607T064000Z
+SUMMARY:QF1602 PER to LEA
+LOCATION:Perth (PER)
+UID:item-46f5e00f-7073-9000-0003-00014b2e6f65@tripit.com
+DTSTART:20270607T044500Z
+DESCRIPTION:View and/or edit details in TripIt : https://www.tripit.com/tr
+ ip/show/id/380960908\n \n\n12:45 PM AWST\n[Flight] PER to LEA\n \n\nQantas
+  1602\, Terminal 4\, Gate \n \n\n2:40 PM AWST\nArrive Learmonth (LEA)\nTer
+ minal \, Gate \n \n\n \nTripIt - organize your travel at https://www.tripi
+ t.com
+GEO:-22.25;114.08333
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261022T045557Z
+SUMMARY:Check-in: Mantarays Ningaloo Beach Resort\, Exmouth
+TRANSP:TRANSPARENT
+UID:item-3e680085-c743-9000-0003-000144d5b391@tripit.com
+DTSTART:20270607T060000Z
+DTEND:20270607T070000Z
+LOCATION:Lot 900 Madaffari Dr\, Exmouth WA 6707\, Australia
+DESCRIPTION:View and/or edit details in TripIt : https://www.tripit.com/tr
+ ip/show/id/380960908\n \n\n2:00 PM AWST\n[Lodging] Arrive Adults\, 2\nChec
+ k-In: 2:00pm\nLot 900 Madaffari Dr\, Exmouth WA 6707\, Australia\n+61 8 99
+ 49 0000\n \n\n \nTripIt - organize your travel at https://www.tripit.com
+GEO:-21.9540601;114.1378339
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261022T045557Z
+SUMMARY:Pick Up Rental Car: Avis
+TRANSP:TRANSPARENT
+UID:item-f32db588-24a4-9000-0003-00014c4170b9@tripit.com
+DTSTART:20270607T070000Z
+DTEND:20270607T080000Z
+LOCATION:Minilya-Exmouth Road\, Learmonth\, Australia\, WA 6707
+DESCRIPTION:View and/or edit details in TripIt : https://www.tripit.com/tr
+ ip/show/id/380960908\n \n\n3:00 PM AWST\n[Car Rental] Pick Up Avis Car Ren
+ tal\nPick-Up: 3:00pm\nMinilya-Exmouth Road\, Learmonth\, Australia\, WA 67
+ 07\n \n\n \nTripIt - organize your travel at https://www.tripit.com
+GEO:-22.1715819;114.0787908
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261022T045557Z
+DTEND:20270609T005000Z
+LOCATION:
+UID:item-b75b289a-355e-9000-0003-000146fdecfd@tripit.com
+DTSTART:20270608T235000Z
+SUMMARY:Whale Shark Discovery 2027
+DESCRIPTION:View and/or edit details in TripIt : https://www.tripit.com/tr
+ ip/show/id/380960908\n \n\nWed\, Jun 9\n7:50 AM AWST\n[Tour] Whale Shark D
+ iscovery 2027\n7:50am to 8:50am\n \n\n \nTripIt - organize your travel at 
+ https://www.tripit.com
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261022T045557Z
+SUMMARY:Check-out: Mantarays Ningaloo Beach Resort\, Exmouth
+TRANSP:TRANSPARENT
+UID:item-da09a093-d361-9000-0003-000144d5b395@tripit.com
+DTSTART:20270613T020000Z
+DTEND:20270613T030000Z
+LOCATION:Lot 900 Madaffari Dr\, Exmouth WA 6707\, Australia
+DESCRIPTION:View and/or edit details in TripIt : https://www.tripit.com/tr
+ ip/show/id/380960908\n \n\nSun\, Jun 13\n10:00 AM AWST\n[Lodging] Depart A
+ dults\, 2\nCheck-Out: 10:00am\nLot 900 Madaffari Dr\, Exmouth WA 6707\, Au
+ stralia\n+61 8 9949 0000\n \n\n \nTripIt - organize your travel at https:/
+ /www.tripit.com
+GEO:-21.9540601;114.1378339
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261022T045557Z
+SUMMARY:Check-in: Ingot Hotel Perth\, an Ascend Collection Hotel
+TRANSP:TRANSPARENT
+UID:item-7fb78d03-179c-9000-0003-00014a862ed9@tripit.com
+DTSTART:20270613T060000Z
+DTEND:20270613T070000Z
+LOCATION:285 Great Eastern Highway\, 6104 Perth\, Australia
+DESCRIPTION:View and/or edit details in TripIt : https://www.tripit.com/tr
+ ip/show/id/380960908\n \n\n2:00 PM AWST\n[Lodging] Arrive Ingot Hotel Pert
+ h\, an Ascend Collection Hotel\nCheck-In: 2:00pm\n285 Great Eastern Highwa
+ y\, 6104 Perth\, Australia\n+61 8 9259 3888\n \n\n \nTripIt - organize you
+ r travel at https://www.tripit.com
+GEO:-31.9390472;115.9314627
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261022T045557Z
+SUMMARY:Drop Off Rental Car: Avis
+TRANSP:TRANSPARENT
+UID:item-9fb24f2b-5014-9000-0003-00014c4170bd@tripit.com
+DTSTART:20270613T070000Z
+DTEND:20270613T080000Z
+LOCATION:The procedure for returning the vehicle will be explained to you 
+ at the rental counter.
+DESCRIPTION:View and/or edit details in TripIt : https://www.tripit.com/tr
+ ip/show/id/380960908\n \n\n3:00 PM AWST\n[Car Rental] Drop Off Avis Car Re
+ ntal\nDrop-Off: 3:00pm\nThe procedure for returning the vehicle will be ex
+ plained to you at the rental counter.\n \n\n \nTripIt - organize your trav
+ el at https://www.tripit.com
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261022T045557Z
+DTEND:20270613T090500Z
+SUMMARY:QF1603 LEA to PER
+LOCATION:Learmonth (LEA)
+UID:item-b28e041a-70b3-9000-0003-00014b2e6f69@tripit.com
+DTSTART:20270613T071500Z
+DESCRIPTION:View and/or edit details in TripIt : https://www.tripit.com/tr
+ ip/show/id/380960908\n \n\n3:15 PM AWST\n[Flight] LEA to PER\n \n\nQantas 
+ 1603\, Terminal \, Gate \n \n\n5:05 PM AWST\nArrive Perth (PER)\nTerminal 
+ 4\, Gate \n \n\n \nTripIt - organize your travel at https://www.tripit.com
+GEO:-31.95224;115.8614
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261022T045557Z
+SUMMARY:Check-out: Ingot Hotel Perth\, an Ascend Collection Hotel
+TRANSP:TRANSPARENT
+UID:item-50df01de-c50d-9000-0003-00014a862edd@tripit.com
+DTSTART:20270614T020000Z
+DTEND:20270614T030000Z
+LOCATION:285 Great Eastern Highway\, 6104 Perth\, Australia
+DESCRIPTION:View and/or edit details in TripIt : https://www.tripit.com/tr
+ ip/show/id/380960908\n \n\nMon\, Jun 14\n10:00 AM AWST\n[Lodging] Depart I
+ ngot Hotel Perth\, an Ascend Collection Hotel\nCheck-Out: 10:00am\n285 Gre
+ at Eastern Highway\, 6104 Perth\, Australia\n+61 8 9259 3888\n \n\n \nTrip
+ It - organize your travel at https://www.tripit.com
+GEO:-31.9390472;115.9314627
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261022T045557Z
+DTEND:20270614T055500Z
+SUMMARY:VA1485 PER to BME
+LOCATION:Perth (PER)
+UID:item-c621824b-96f6-9000-0003-00014a86046d@tripit.com
+DTSTART:20270614T032000Z
+DESCRIPTION:View and/or edit details in TripIt : https://www.tripit.com/tr
+ ip/show/id/380960908\n \n\n11:20 AM AWST\n[Flight] PER to BME\n \n\nVirgin
+  Australia 1485\, Terminal T1\, Gate \n \n\n1:55 PM AWST\nArrive Broome (B
+ ME)\nTerminal \, Gate \n \n\n \nTripIt - organize your travel at https://w
+ ww.tripit.com
+GEO:-17.95538;122.23922
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261022T045557Z
+SUMMARY:Check-in: The Continental Hotel
+TRANSP:TRANSPARENT
+UID:item-bdac8ce9-b155-9000-0003-00014689011d@tripit.com
+DTSTART:20270614T060000Z
+DTEND:20270614T070000Z
+LOCATION:1 Weld Street\, Djugun Broome\, WA 6725\, Australia
+DESCRIPTION:View and/or edit details in TripIt : https://www.tripit.com/tr
+ ip/show/id/380960908\n \n\n2:00 PM AWST\n[Lodging] Arrive The Continental 
+ Hotel\nCheck-In: 2:00pm\n1 Weld Street\, Djugun Broome\, WA 6725\, Austral
+ ia\n \n\n \nTripIt - organize your travel at https://www.tripit.com
+GEO:-17.955652;122.2398053
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261022T045557Z
+SUMMARY:Check-out: The Continental Hotel
+TRANSP:TRANSPARENT
+UID:item-a88ec4ba-0886-9000-0003-000146890125@tripit.com
+DTSTART:20270618T020000Z
+DTEND:20270618T030000Z
+LOCATION:1 Weld Street\, Djugun Broome\, WA 6725\, Australia
+DESCRIPTION:View and/or edit details in TripIt : https://www.tripit.com/tr
+ ip/show/id/380960908\n \n\nFri\, Jun 18\n10:00 AM AWST\n[Lodging] Depart T
+ he Continental Hotel\nCheck-Out: 10:00am\n1 Weld Street\, Djugun Broome\, 
+ WA 6725\, Australia\n \n\n \nTripIt - organize your travel at https://www.
+ tripit.com
+GEO:-17.955652;122.2398053
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261022T045557Z
+LOCATION:Broome Port Jetty\; 401 Port Dr\, Minyirr WA 6725\, Australia
+UID:item-b141eca5-43cc-9000-0003-000142dae67d@tripit.com
+DTSTART:20270618T040000Z
+DTEND:20270618T050000Z
+SUMMARY:Embark - coral expeditions
+DESCRIPTION:View and/or edit details in TripIt : https://www.tripit.com/tr
+ ip/show/id/380960908\n \n\n12:00 PM AWST\n[Cruise] Embark - coral expediti
+ ons\nCoral expeditions\, Discoverer\nBroome Port Jetty\, 401 Port Dr\, Min
+ yirr WA 6725\, Australia\n \n\n \nTripIt - organize your travel at https:/
+ /www.tripit.com
+GEO:-18.0032625;122.2105163
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261022T045557Z
+LOCATION:Darwin Port Cruise Ship Terminal\; 1 Anchorage Court\, Darwin Cit
+ y NT 0800\, Australia
+UID:item-303cd562-8201-9000-0003-000142dae681@tripit.com
+DTSTART:20270628T023000Z
+DTEND:20270628T033000Z
+SUMMARY:Disembark - coral expeditions
+DESCRIPTION:View and/or edit details in TripIt : https://www.tripit.com/tr
+ ip/show/id/380960908\n \n\nMon\, Jun 28\n12:00 PM ACST\n[Cruise] Disembark
+  - coral expeditions\nCoral expeditions\, Discoverer\nDarwin Port Cruise S
+ hip Terminal\, 1 Anchorage Court\, Darwin City NT 0800\, Australia\n \n\n 
+ \nTripIt - organize your travel at https://www.tripit.com
+GEO:-12.4711579;130.8453858
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261022T045557Z
+SUMMARY:Check-in: Argus Apartments Darwin
+TRANSP:TRANSPARENT
+UID:item-c004c2c8-f6a7-9000-0003-00014699080d@tripit.com
+DTSTART:20270628T043000Z
+DTEND:20270628T053000Z
+LOCATION:6 Cardona Court\, Darwin CBD \, 0800 Darwin\, Australia
+DESCRIPTION:View and/or edit details in TripIt : https://www.tripit.com/tr
+ ip/show/id/380960908\n \n\n2:00 PM ACST\n[Lodging] Arrive Argus Apartments
+  Darwin\nCheck-In: 2:00pm\n6 Cardona Court\, Darwin CBD \, 0800 Darwin\, A
+ ustralia\n+61 8 8925 5000\n \n\n \nTripIt - organize your travel at https:
+ //www.tripit.com
+GEO:-12.462044;130.8451308
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261022T045557Z
+DTEND:20270701T000000Z
+SUMMARY:QF1889 DRW to CNS
+LOCATION:Darwin (DRW)
+UID:item-88c5f91a-3d8e-9000-0003-00014a88d99d@tripit.com
+DTSTART:20270630T213000Z
+DESCRIPTION:View and/or edit details in TripIt : https://www.tripit.com/tr
+ ip/show/id/380960908\n \n\nThu\, Jul 1\n7:00 AM ACST\n[Flight] DRW to CNS\
+ n \n\nQantas 1889\, Terminal \, Gate \n \n\n10:00 AM AEST\nArrive Cairns (
+ CNS)\nTerminal 2\, Gate \n \n\n \nTripIt - organize your travel at https:/
+ /www.tripit.com
+GEO:-16.92366;145.76613
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261022T045557Z
+SUMMARY:Check-out: Argus Apartments Darwin
+TRANSP:TRANSPARENT
+UID:item-0189f541-1965-9000-0003-000146990811@tripit.com
+DTSTART:20270701T003000Z
+DTEND:20270701T013000Z
+LOCATION:6 Cardona Court\, Darwin CBD \, 0800 Darwin\, Australia
+DESCRIPTION:View and/or edit details in TripIt : https://www.tripit.com/tr
+ ip/show/id/380960908\n \n\n10:00 AM ACST\n[Lodging] Depart Argus Apartment
+ s Darwin\nCheck-Out: 10:00am\n6 Cardona Court\, Darwin CBD \, 0800 Darwin\
+ , Australia\n+61 8 8925 5000\n \n\n \nTripIt - organize your travel at htt
+ ps://www.tripit.com
+GEO:-12.462044;130.8451308
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261022T045557Z
+SUMMARY:Check-in: Beachfront Terraces with Onsite Reception & Check In
+TRANSP:TRANSPARENT
+UID:item-0149932a-f2cb-9000-0003-00014a62a0ad@tripit.com
+DTSTART:20270701T040000Z
+DTEND:20270701T050000Z
+LOCATION:17 The Esplanade\, 4877 Port Douglas\, Australia
+DESCRIPTION:View and/or edit details in TripIt : https://www.tripit.com/tr
+ ip/show/id/380960908\n \n\n2:00 PM AEST\n[Lodging] Arrive Beachfront Terra
+ ces with Onsite Reception & Check In\nCheck-In: 2:00pm\n17 The Esplanade\,
+  4877 Port Douglas\, Australia\n+61740995397\n \n\n \nTripIt - organize yo
+ ur travel at https://www.tripit.com
+GEO:-16.4868587;145.4676142
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261022T045557Z
+SUMMARY:Check-out: Beachfront Terraces with Onsite Reception & Check In
+TRANSP:TRANSPARENT
+UID:item-830a036f-cf98-9000-0003-00014a62a0b1@tripit.com
+DTSTART:20270707T000000Z
+DTEND:20270707T010000Z
+LOCATION:17 The Esplanade\, 4877 Port Douglas\, Australia
+DESCRIPTION:View and/or edit details in TripIt : https://www.tripit.com/tr
+ ip/show/id/380960908\n \n\nWed\, Jul 7\n10:00 AM AEST\n[Lodging] Depart Be
+ achfront Terraces with Onsite Reception & Check In\nCheck-Out: 10:00am\n17
+  The Esplanade\, 4877 Port Douglas\, Australia\n+61740995397\n \n\n \nTrip
+ It - organize your travel at https://www.tripit.com
+GEO:-16.4868587;145.4676142
+END:VEVENT
+END:VCALENDAR
